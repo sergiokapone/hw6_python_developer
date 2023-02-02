@@ -1,5 +1,5 @@
 from os import listdir, makedirs, rmdir, rename
-from os.path import isdir, isfile, splitext, basename, exists
+from os.path import isdir, isfile, splitext, basename, exists, join
 import shutil
 import sys
 
@@ -181,14 +181,6 @@ FOLDERS[ARCHIVES] = 'archives'
 """ ============================= Функці =================================="""
 
 
-def full_path(path, item):
-    """Функція приймає шлях до файлу чи папки і об'єднує їх у повний шлях.
-
-    """
-
-    return "/".join([path, item])
-
-
 def separate_file_name_ext(path, item):
     """Функція повертає ім'я та розширення файлу (у верхньому регістрі).
 
@@ -196,7 +188,7 @@ def separate_file_name_ext(path, item):
     Якщо на вхід подається імя папки, то повертає кортеж двох порожніх рядків.
     """
 
-    full_item_path = full_path(path, item)
+    full_item_path = join(path, item)
 
     if isfile(full_item_path):
         name, ext = splitext(basename(full_item_path))
@@ -221,8 +213,8 @@ def create_folders(path):
     for ext in exts:
         for key in FOLDERS.keys():
             if ext in key:
-                if not exists(full_path(path, FOLDERS[key])):
-                    makedirs(full_path(path, FOLDERS[key]))
+                if not exists(join(path, FOLDERS[key])):
+                    makedirs(join(path, FOLDERS[key]))
 
 
 def move_file(path, file_name_ext):
@@ -235,16 +227,16 @@ def move_file(path, file_name_ext):
     """
 
     file_name, file_ext = separate_file_name_ext(path, file_name_ext)
-    full_path_to_file = full_path(path, file_name_ext)
+    full_path_to_file = join(path, file_name_ext)
     for key in FOLDERS.keys():
         if file_ext in key:
             shutil.move(full_path_to_file,
-                        full_path(path, FOLDERS[key]))
+                        join(path, FOLDERS[key]))
             if file_ext in ARCHIVES:
-                full_path_to_arj_file = full_path(path, FOLDERS[key])
+                full_path_to_arj_file = join(path, FOLDERS[key])
                 unpack(
-                       full_path(full_path_to_arj_file, file_name_ext),
-                       full_path(full_path_to_arj_file, file_name)
+                       join(full_path_to_arj_file, file_name_ext),
+                       join(full_path_to_arj_file, file_name)
                         )
 
 
@@ -257,8 +249,8 @@ def normalise_file_name(path, old_name_ext):
     old_name, ext = separate_file_name_ext(path, old_name_ext)
     new_name = normalize(old_name)
     new_name_ext = ".".join([new_name, ext.lower()])
-    full_path_old_name_file = full_path(path, old_name_ext)
-    full_path_new_name_file = full_path(path, new_name_ext)
+    full_path_old_name_file = join(path, old_name_ext)
+    full_path_new_name_file = join(path, new_name_ext)
     rename(full_path_old_name_file, full_path_new_name_file)
 
 
@@ -272,13 +264,13 @@ def sort_dir(path):
         rmdir(path)
     else:
         for item in listdir(path):
-            if isdir(full_path(path, item)) and\
+            if isdir(join(path, item)) and\
                     item not in FOLDERS.values():
-                sort_dir(full_path(path, item))
+                sort_dir(join(path, item))
             else:
                 create_folders(path)
                 for item in listdir(path):
-                    if isfile(full_path(path, item)):
+                    if isfile(join(path, item)):
                         normalise_file_name(path, item)
                         move_file(path, item)
 
