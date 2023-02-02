@@ -276,10 +276,10 @@ def unpack(archive_path, path_to_unpack):
 
 if __name__ == '__main__':
     path = PATH
-    agrreemetnt = input(
+    agreement = input(
         f'УВАГА! Ви впевнені, що шочере сортувати файли в КАТАЛОЗІ {path}? (y/n):'
         )
-    if agrreemetnt in ('y', 'Y', 'н', 'Н'):
+    if agreement in ('y', 'Y', 'н', 'Н'):
         sort_dir(path)
         input('Операція успішно завершена! Натисніть довільну клавішу')
     else:
