@@ -122,6 +122,7 @@ TRANS = {'а': 'a',
 LATIN_CODES = tuple(range(65, 91)) + tuple(range(97, 123))
 CYR_CODES = tuple(range(1024, 1280))
 OTHER_SYMBOLS = tuple(str(x) for x in range(0, 10)) + tuple()
+WILDCARD = '_'
 
 
 def normalize(file_name):
@@ -145,7 +146,7 @@ def normalize(file_name):
         elif ord(letter) in CYR_CODES:
             trans += TRANS.get(letter)
         else:
-            trans += '_'
+            trans += WILDCARD
 
     return trans
 
