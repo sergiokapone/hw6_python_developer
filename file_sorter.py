@@ -43,6 +43,10 @@ sort.py, тоді, щоб відсортувати папку /user/Desktop/Мо
 
 PATH = sys.argv[1]
 
+
+""" ========================== Таблиця транслітерації ======================"""
+
+
 TRANS = {'а': 'a',
  'А': 'A',
  'б': 'b',
@@ -118,11 +122,19 @@ TRANS = {'а': 'a',
  'ґ': 'g',
  'Ґ': 'G'}
 
+""" ==================== Таблиця кодівань =================================="""
+
+
 # https://www.w3schools.com/charsets/ref_utf_cyrillic.asp
 LATIN_CODES = tuple(range(65, 91)) + tuple(range(97, 123))
+
 CYR_CODES = tuple(range(1024, 1280))
+
 OTHER_SYMBOLS = tuple(str(x) for x in range(0, 10)) + tuple()
+
 WILDCARD = '_'
+
+""" ======================== Функця нормалізації ==========================="""
 
 
 def normalize(file_name):
@@ -151,6 +163,9 @@ def normalize(file_name):
     return trans
 
 
+""" =============== Таблиця відаовідності папок і розширень ================"""
+
+
 FOLDERS = {
     ('MP3', 'OGG', 'WAV', 'AMR'): 'audio',
     ('AVI', 'MP4', 'MOV', 'MKV'): 'video',
@@ -161,6 +176,9 @@ FOLDERS = {
 
 ARCHIVES = ('ZIP', 'GZ', 'TAR', '7Z')
 FOLDERS[ARCHIVES] = 'archives'
+
+
+""" ============================= Функці =================================="""
 
 
 def full_path(path, item):
@@ -273,6 +291,9 @@ def unpack(archive_path, path_to_unpack):
         shutil.unpack_archive(archive_path, path_to_unpack)
     except (OSError, IOError):
         print(f"Unsupported file format {archive_path}")
+
+
+""" ======================== Основна програма =============================="""
 
 
 if __name__ == '__main__':
