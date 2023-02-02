@@ -176,8 +176,11 @@ EXT_FOLDER = {
     }
 
 ARCHIVES = ('ZIP', 'GZ', 'TAR', '7Z')
+
 EXT_FOLDER[ARCHIVES] = 'archives'
+
 FOLDERS = EXT_FOLDER.values()
+
 EXTS = EXT_FOLDER.keys()
 
 
@@ -194,7 +197,9 @@ def separate_file_name_ext(path, item):
     full_item_path = join(path, item)
 
     if isfile(full_item_path):
+
         name, ext = splitext(basename(full_item_path))
+
         return name, ext.lstrip('.').upper()
     return "", ""
 
@@ -209,14 +214,21 @@ def create_folders(path):
     """
 
     current_folder_exts = set()
+
     for item in listdir(path):
+
         file_ext = separate_file_name_ext(path, item)[1]
+
         current_folder_exts.add(file_ext)
 
     for ext in current_folder_exts:
+
         for key in EXTS:
+
             if ext in key:
+
                 if not exists(join(path, EXT_FOLDER[key])):
+
                     makedirs(join(path, EXT_FOLDER[key]))
 
 
@@ -230,13 +242,20 @@ def move_file(path, file_name_ext):
     """
 
     file_name, file_ext = separate_file_name_ext(path, file_name_ext)
+
     full_path_to_file = join(path, file_name_ext)
+
     for key in EXTS:
+
         if file_ext in key:
+
             shutil.move(full_path_to_file,
                         join(path, EXT_FOLDER[key]))
+
             if file_ext in ARCHIVES:
+
                 full_path_to_arj_file = join(path, EXT_FOLDER[key])
+
                 unpack(
                        join(full_path_to_arj_file, file_name_ext),
                        join(full_path_to_arj_file, file_name)
@@ -251,10 +270,15 @@ def normalise_file_name(path, old_name_ext):
     """
 
     old_name, ext = separate_file_name_ext(path, old_name_ext)
+
     new_name = normalize(old_name)
+
     new_name_ext = ".".join([new_name, ext.lower()])
+
     full_path_old_name_file = join(path, old_name_ext)
+
     full_path_new_name_file = join(path, new_name_ext)
+
     rename(full_path_old_name_file, full_path_new_name_file)
 
 
@@ -266,17 +290,28 @@ def sort_dir(path):
     """
 
     if len(listdir(path)) == 0:
+
         rmdir(path)
+
     else:
+
         for item in listdir(path):
+
             if isdir(join(path, item)) and\
                     item not in FOLDERS:
+
                 sort_dir(join(path, item))
+
             else:
+
                 create_folders(path)
+
                 for item in listdir(path):
+
                     if isfile(join(path, item)):
+
                         normalise_file_name(path, item)
+
                         move_file(path, item)
 
 
@@ -285,8 +320,11 @@ def unpack(archive_path, path_to_unpack):
 
     """
     try:
+
         shutil.unpack_archive(archive_path, path_to_unpack)
+
     except (OSError, IOError):
+
         print(f"Unsupported file format {archive_path}")
 
 
@@ -294,12 +332,19 @@ def unpack(archive_path, path_to_unpack):
 
 
 if __name__ == '__main__':
+
     path = PATH
+
     agreement = input(
         f'УВАГА! Ви впевнені, що шочере сортувати файли в КАТАЛОЗІ {path}? (y/n):'
         )
+
     if agreement in ('y', 'Y', 'н', 'Н'):
+
         sort_dir(path)
+
         input('Операція успішно завершена! Натисніть довільну клавішу')
+
     else:
+
         print('Операція відмінена!')
