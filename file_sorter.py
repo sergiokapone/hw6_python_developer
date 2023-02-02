@@ -126,6 +126,7 @@ TRANS = {'а': 'a',
 
 
 # https://www.w3schools.com/charsets/ref_utf_cyrillic.asp
+
 LATIN_CODES = tuple(range(65, 91)) + tuple(range(97, 123))
 
 CYR_CODES = tuple(range(1024, 1280))
@@ -166,7 +167,7 @@ def normalize(file_name):
 """ =============== Таблиця відаовідності папок і розширень ================"""
 
 
-FOLDERS = {
+EXT_FOLDER = {
     ('MP3', 'OGG', 'WAV', 'AMR'): 'audio',
     ('AVI', 'MP4', 'MOV', 'MKV'): 'video',
     ('JPEG', 'PNG', 'JPG', 'SVG'): 'images',
@@ -175,7 +176,9 @@ FOLDERS = {
     }
 
 ARCHIVES = ('ZIP', 'GZ', 'TAR', '7Z')
-FOLDERS[ARCHIVES] = 'archives'
+EXT_FOLDER[ARCHIVES] = 'archives'
+FOLDERS = EXT_FOLDER.values()
+EXTS = EXT_FOLDER.keys()
 
 
 """ ============================= Функці =================================="""
@@ -202,7 +205,7 @@ def create_folders(path):
     Приймає шлях до КАТАЛОГУ.
 
     Дані про відповідність розширення і каталогу
-    знаходяться в словнику FOLDERS.
+    знаходяться в словнику EXT_FOLDER.
     """
 
     exts = set()
@@ -211,10 +214,10 @@ def create_folders(path):
         exts.add(file_ext)
 
     for ext in exts:
-        for key in FOLDERS.keys():
+        for key in EXTS:
             if ext in key:
-                if not exists(join(path, FOLDERS[key])):
-                    makedirs(join(path, FOLDERS[key]))
+                if not exists(join(path, EXT_FOLDER[key])):
+                    makedirs(join(path, EXT_FOLDER[key]))
 
 
 def move_file(path, file_name_ext):
@@ -228,12 +231,12 @@ def move_file(path, file_name_ext):
 
     file_name, file_ext = separate_file_name_ext(path, file_name_ext)
     full_path_to_file = join(path, file_name_ext)
-    for key in FOLDERS.keys():
+    for key in EXTS:
         if file_ext in key:
             shutil.move(full_path_to_file,
-                        join(path, FOLDERS[key]))
+                        join(path, EXT_FOLDER[key]))
             if file_ext in ARCHIVES:
-                full_path_to_arj_file = join(path, FOLDERS[key])
+                full_path_to_arj_file = join(path, EXT_FOLDER[key])
                 unpack(
                        join(full_path_to_arj_file, file_name_ext),
                        join(full_path_to_arj_file, file_name)
@@ -246,6 +249,7 @@ def normalise_file_name(path, old_name_ext):
     Приймає шлях до файлу та його ім'я з розширенням.
 
     """
+
     old_name, ext = separate_file_name_ext(path, old_name_ext)
     new_name = normalize(old_name)
     new_name_ext = ".".join([new_name, ext.lower()])
@@ -260,12 +264,13 @@ def sort_dir(path):
     Приймає шлях до КАТАЛОГУ.
 
     """
+
     if len(listdir(path)) == 0:
         rmdir(path)
     else:
         for item in listdir(path):
             if isdir(join(path, item)) and\
-                    item not in FOLDERS.values():
+                    item not in FOLDERS:
                 sort_dir(join(path, item))
             else:
                 create_folders(path)
