@@ -2,7 +2,7 @@ from os import listdir, makedirs, rmdir, rename
 from os.path import isdir, isfile, splitext, basename, exists
 import shutil
 import sys
-
+from termcolor import colored
 
 
 
@@ -42,6 +42,8 @@ sort.py, тоді, щоб відсортувати папку /user/Desktop/Мо
 
 """
 
+
+PATH = sys.argv[1]
 
 TRANS = {'а': 'a',
  'А': 'A',
@@ -163,17 +165,37 @@ FOLDERS[ARCHIVES] = 'archives'
 
 
 def full_path(path, item):
+    """Функція приймає шлях до файлу чи папки і об'єднує їх у повний шлях.
+
+    """
+
     return "/".join([path, item])
 
 
 def separate_file_name_ext(path, item):
-    if isfile(full_path(path, item)):
-        name, ext = splitext(basename(full_path(path, item)))
+    """Функція повертає ім'я та розширення файлу (у верхньому регістрі).
+
+    На вхід подається шлях до файлу, та його ім'я зрозширенням.
+    Якщо на вхід подається імя папки, то повертає кортеж двох порожніх рядків.
+    """
+
+    full_item_path = full_path(path, item)
+
+    if isfile(full_item_path):
+        name, ext = splitext(basename(full_item_path))
         return name, ext.lstrip('.').upper()
     return "", ""
 
 
 def create_folders(path):
+    """Функція створює у КАТАЛОЗІ папки відповідно до їх розширення.
+
+    Приймає шлях до КАТАЛОГУ.
+
+    Дані про відповідність розширення і каталогу
+    знаходяться в словнику FOLDERS.
+    """
+
     exts = set()
     for item in listdir(path):
         file_ext = separate_file_name_ext(path, item)[1]
@@ -187,27 +209,48 @@ def create_folders(path):
 
 
 def move_file(path, file_name_ext):
-    file_name, file_ext = separate_file_name_ext(path, file_name_ext)
+    """Функція переміщує файли до відповідних каталогів.
 
+    Приймає шлях до КАТАЛОГУ і та ім'я файлу з розширенням.
+
+    Дані про відповідність розширення і каталогу
+    знаходяться в словнику FOLDERS.
+    """
+
+    file_name, file_ext = separate_file_name_ext(path, file_name_ext)
+    full_path_to_file = full_path(path, file_name_ext)
     for key in FOLDERS.keys():
         if file_ext in key:
-            shutil.move(full_path(path, file_name_ext),\
+            shutil.move(full_path_to_file,
                         full_path(path, FOLDERS[key]))
             if file_ext in ARCHIVES:
+                full_path_to_arj_file = full_path(path, FOLDERS[key])
                 unpack(
-                       full_path(full_path(path, FOLDERS[key]), file_name_ext),\
-                       full_path(full_path(path, FOLDERS[key]), file_name)\
+                       full_path(full_path_to_arj_file, file_name_ext),
+                       full_path(full_path_to_arj_file, file_name)
                         )
 
 
 def normalise_file_name(path, old_name_ext):
+    """Функція перейменовує файли відповідно до таблиці транслітерації TRANS.
+
+    Приймає шлях до файлу та його ім'я з розширенням.
+
+    """
     old_name, ext = separate_file_name_ext(path, old_name_ext)
     new_name = normalize(old_name)
     new_name_ext = ".".join([new_name, ext.lower()])
-    rename(full_path(path, old_name_ext), full_path(path, new_name_ext))
+    full_path_old_name_file = full_path(path, old_name_ext)
+    full_path_new_name_file = full_path(path, new_name_ext)
+    rename(full_path_old_name_file, full_path_new_name_file)
 
 
 def sort_dir(path):
+    """Функція фасує файли по відповідним папкам.
+
+    Приймає шлях до КАТАЛОГУ.
+
+    """
     if len(listdir(path)) == 0:
         rmdir(path)
     else:
@@ -230,11 +273,16 @@ def unpack(archive_path, path_to_unpack):
     try:
         shutil.unpack_archive(archive_path, path_to_unpack)
     except (OSError, IOError):
-        print("Unsupported file format {archive_path}")
-
+        print(f"Unsupported file format {archive_path}")
 
 
 if __name__ == '__main__':
-    path = sys.argv[1]
-    sort_dir(path)
-
+    path = PATH
+    agrreemetnt = input(
+        f'УВАГА! Ви впевнені, що шочере сортувати файли в КАТАЛОЗІ {path}? (y/n):'
+        )
+    if agrreemetnt in ('y', 'Y', 'н', 'Н'):
+        sort_dir(path)
+        input('Операція успішно завершена! Натисніть довільну клавішу')
+    else:
+        print('Операція відмінена!')
