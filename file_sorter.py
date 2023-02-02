@@ -2,8 +2,6 @@ from os import listdir, makedirs, rmdir, rename
 from os.path import isdir, isfile, splitext, basename, exists
 import shutil
 import sys
-from termcolor import colored
-
 
 
 """
