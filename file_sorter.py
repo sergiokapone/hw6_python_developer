@@ -1,6 +1,7 @@
 from os import listdir, makedirs, rmdir, rename
 from os.path import isdir, isfile, splitext, basename, exists
 import shutil
+import sys
 
 
 
@@ -153,10 +154,12 @@ FOLDERS = {
     ('MP3', 'OGG', 'WAV', 'AMR'): 'audio',
     ('AVI', 'MP4', 'MOV', 'MKV'): 'video',
     ('JPEG', 'PNG', 'JPG', 'SVG'): 'images',
-    ('ZIP', 'GZ', 'TAR'): 'archives',
     ('DOC', 'DOCX', 'TXT', 'XLSX', 'XLS', 'PPTX'): 'documents',
     ('DJVU', 'DJV', 'PDF'): 'books'
     }
+
+ARCHIVES = ('ZIP', 'GZ', 'TAR', '7Z')
+FOLDERS[ARCHIVES] = 'archives'
 
 
 def full_path(path, item):
@@ -167,7 +170,7 @@ def separate_file_name_ext(path, item):
     if isfile(full_path(path, item)):
         name, ext = splitext(basename(full_path(path, item)))
         return name, ext.lstrip('.').upper()
-    return "",""
+    return "", ""
 
 
 def create_folders(path):
@@ -190,6 +193,11 @@ def move_file(path, file_name_ext):
         if file_ext in key:
             shutil.move(full_path(path, file_name_ext),\
                         full_path(path, FOLDERS[key]))
+            if file_ext in ARCHIVES:
+                unpack(
+                       full_path(full_path(path, FOLDERS[key]), file_name_ext),\
+                       full_path(full_path(path, FOLDERS[key]), file_name)\
+                        )
 
 
 def normalise_file_name(path, old_name_ext):
@@ -212,19 +220,21 @@ def sort_dir(path):
                 for item in listdir(path):
                     if isfile(full_path(path, item)):
                         normalise_file_name(path, item)
-                for item in listdir(path):
-                    if isfile(full_path(path, item)):
                         move_file(path, item)
-                        # unzip_files(path, item)
 
-# def unzip_files(path, item):
-#     for exts in FOLDERS.keys():
-#     if splitext(basename(full_path(path, item)))[1].lstrip('.'.upper()) in FOLDERS:
+
+def unpack(archive_path, path_to_unpack):
+    """Розраковувач файлів.
+
+    """
+    try:
+        shutil.unpack_archive(archive_path, path_to_unpack)
+    except (OSError, IOError):
+        print("Unsupported file format {archive_path}")
+
 
 
 if __name__ == '__main__':
-    path = 'd:/Different/Garbage'
+    path = sys.argv[1]
     sort_dir(path)
-    # for item in listdir(path):
-    #     normalise_file_name(path, item)
 
