@@ -159,59 +159,72 @@ FOLDERS = {
     }
 
 
+def full_path(path, item):
+    return "/".join([path, item])
+
+
+def separate_file_name_ext(path, item):
+    if isfile(full_path(path, item)):
+        name, ext = splitext(basename(full_path(path, item)))
+        return name, ext.lstrip('.').upper()
+    return "",""
+
+
 def create_folders(path):
     exts = set()
     for item in listdir(path):
-        exts.add(splitext(item)[1].lstrip('.').upper())
+        file_ext = separate_file_name_ext(path, item)[1]
+        exts.add(file_ext)
+
     for ext in exts:
         for key in FOLDERS.keys():
             if ext in key:
-                if not exists("/".join([path, FOLDERS[key]])):
-                    makedirs("/".join([path, FOLDERS[key]]))
+                if not exists(full_path(path, FOLDERS[key])):
+                    makedirs(full_path(path, FOLDERS[key]))
 
 
 def move_file(path, file_name_ext):
-    file_name, file_ext = splitext("/".join([path, file_name_ext]))
-    file_ext = file_ext.lstrip('.').upper()
+    file_name, file_ext = separate_file_name_ext(path, file_name_ext)
 
     for key in FOLDERS.keys():
         if file_ext in key:
-            shutil.move("/".join([path, file_name_ext]),\
-                        "/".join([path, FOLDERS[key]]))
+            shutil.move(full_path(path, file_name_ext),\
+                        full_path(path, FOLDERS[key]))
 
 
 def normalise_file_name(path, old_name_ext):
-    old_name_ext = basename('/'.join([path, old_name_ext]))
-    old_name, ext = splitext(old_name_ext)
+    old_name, ext = separate_file_name_ext(path, old_name_ext)
     new_name = normalize(old_name)
-    new_name_ext = "".join([new_name, ext])
-    rename("/".join([path, old_name_ext]), "/".join([path, new_name_ext]))
-
-
-def remove_empty_folder(path):
-    """Видаляє порожню папку
-    """
-
-    dir = listdir(path)
-    if len(dir) == 0:
-        rmdir(path)
-        return True
-    return False
+    new_name_ext = ".".join([new_name, ext.lower()])
+    rename(full_path(path, old_name_ext), full_path(path, new_name_ext))
 
 
 def sort_dir(path):
-    for item in listdir(path):
-        if isdir("/".join([path, item])) and\
-                item not in FOLDERS.values():
-            sort_dir("/".join([path, item]))
-        else:
-            create_folders(path)
-            for item in listdir(path):
-                if isfile("/".join([path, item])):
-                    normalise_file_name(path, item)
-            for item in listdir(path):
-                if isfile("/".join([path, item])):
-                    move_file(path, item)
+    if len(listdir(path)) == 0:
+        rmdir(path)
+    else:
+        for item in listdir(path):
+            if isdir(full_path(path, item)) and\
+                    item not in FOLDERS.values():
+                sort_dir(full_path(path, item))
+            else:
+                create_folders(path)
+                for item in listdir(path):
+                    if isfile(full_path(path, item)):
+                        normalise_file_name(path, item)
+                for item in listdir(path):
+                    if isfile(full_path(path, item)):
+                        move_file(path, item)
+                        # unzip_files(path, item)
+
+# def unzip_files(path, item):
+#     for exts in FOLDERS.keys():
+#     if splitext(basename(full_path(path, item)))[1].lstrip('.'.upper()) in FOLDERS:
 
 
-sort_dir('d:/Different/Garbage')
+if __name__ == '__main__':
+    path = 'd:/Different/Garbage'
+    sort_dir(path)
+    # for item in listdir(path):
+    #     normalise_file_name(path, item)
+
