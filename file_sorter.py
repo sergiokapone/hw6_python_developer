@@ -201,6 +201,7 @@ def separate_file_name_ext(path, item):
         name, ext = splitext(basename(full_item_path))
 
         return name, ext.lstrip('.').upper()
+
     return "", ""
 
 
