@@ -189,6 +189,9 @@ def normalise_file_name(path, old_name_ext):
 
 
 def remove_empty_folder(path):
+    """Видаляє порожню папку
+    """
+
     dir = listdir(path)
     if len(dir) == 0:
         rmdir(path)
