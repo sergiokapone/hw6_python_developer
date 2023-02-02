@@ -208,12 +208,12 @@ def create_folders(path):
     знаходяться в словнику EXT_FOLDER.
     """
 
-    exts = set()
+    current_folder_exts = set()
     for item in listdir(path):
         file_ext = separate_file_name_ext(path, item)[1]
-        exts.add(file_ext)
+        current_folder_exts.add(file_ext)
 
-    for ext in exts:
+    for ext in current_folder_exts:
         for key in EXTS:
             if ext in key:
                 if not exists(join(path, EXT_FOLDER[key])):
