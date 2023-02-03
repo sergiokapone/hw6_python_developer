@@ -116,9 +116,7 @@ def sort_dir(path):
 
                     if item.is_file():
 
-                        item = normalise_file_name(item)
-
-                        move_file(item)
+                        move_file(normalise_file_name(item))
 
 
 def unpack(archive_path, path_to_unpack):
