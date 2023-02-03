@@ -3,8 +3,6 @@ import sys
 from pathlib import Path
 from normaliser import normalise
 
-PATH = Path(sys.argv[1])
-
 
 """ =============== Таблиця відаовідності папок і розширень ================"""
 
@@ -71,12 +69,16 @@ def move_file(file):
 
         if ext in key:
 
-            shutil.move(file, Path(path).joinpath(EXT_FOLDER[key]))
+            shutil.move(
+                file, 
+                Path(path).joinpath(EXT_FOLDER[key]))
 
             if ext in ARCHIVES:
 
-                unpack(Path(path).joinpath(EXT_FOLDER[key], name),
-                       Path(path).joinpath(EXT_FOLDER[key], file.stem))
+                unpack(
+                    Path(path).joinpath(EXT_FOLDER[key], name),
+                    Path(path).joinpath(EXT_FOLDER[key], file.stem)
+                        )
 
 
 def normalise_file_name(file):
@@ -89,7 +91,8 @@ def normalise_file_name(file):
     normalised_name = normalise(the_path.stem)
 
     new_file_path = the_path.parent.joinpath("".join([normalised_name,
-                                                      the_path.suffix]))
+                                                      the_path.suffix])
+                                             )
 
     the_path.rename(new_file_path)
 
@@ -146,11 +149,13 @@ def unpack(archive_path, path_to_unpack):
 
 if __name__ == '__main__':
 
+    PATH = Path(sys.argv[1])
+
     agreement = input(
         f'УВАГА! Ви впевнені, що хочере сортувати файли в КАТАЛОЗІ {PATH}? (y/n): '
         )
 
-    if agreement in ('y', 'Y', 'н', 'Н'):
+    if agreement in ('y', 'Y', 'yes', 'Yes', 'YES'):
 
         sort_dir(PATH)
 
