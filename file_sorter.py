@@ -88,7 +88,8 @@ def normalise_file_name(file):
 
     normalised_name = normalise(the_path.stem)
 
-    new_file_path = the_path.parent.joinpath("".join([normalised_name, the_path.suffix]))
+    new_file_path = the_path.parent.joinpath("".join([normalised_name,
+                                                      the_path.suffix]))
 
     the_path.rename(new_file_path)
 
