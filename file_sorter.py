@@ -29,6 +29,7 @@ EXTS = EXT_FOLDER.keys()
 
 def create_folders(path):
     """Функція створює у КАТАЛОЗІ папки відповідно до їх розширення."""
+
     the_path = Path(path)
 
     files_exts = set()
