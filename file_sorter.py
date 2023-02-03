@@ -70,7 +70,7 @@ def move_file(file):
         if ext in key:
 
             shutil.move(
-                file, 
+                file,
                 Path(path).joinpath(EXT_FOLDER[key]))
 
             if ext in ARCHIVES:
