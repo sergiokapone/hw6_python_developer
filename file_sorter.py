@@ -8,16 +8,16 @@ from normaliser import normalise
 
 
 EXT_FOLDER = {
-    ('MP3', 'OGG', 'WAV', 'AMR'): 'audio',
-    ('AVI', 'MP4', 'MOV', 'MKV'): 'video',
-    ('JPEG', 'PNG', 'JPG', 'SVG'): 'images',
-    ('DOC', 'DOCX', 'TXT', 'XLSX', 'XLS', 'PPTX'): 'documents',
-    ('DJVU', 'DJV', 'PDF'): 'books'
-    }
+    ("MP3", "OGG", "WAV", "AMR"): "audio",
+    ("AVI", "MP4", "MOV", "MKV"): "video",
+    ("JPEG", "PNG", "JPG", "SVG"): "images",
+    ("DOC", "DOCX", "TXT", "XLSX", "XLS", "PPTX"): "documents",
+    ("DJVU", "DJV", "PDF"): "books",
+}
 
-ARCHIVES = ('ZIP', 'GZ', 'TAR', '7Z')
+ARCHIVES = ("ZIP", "GZ", "TAR", "7Z")
 
-EXT_FOLDER[ARCHIVES] = 'archives'
+EXT_FOLDER[ARCHIVES] = "archives"
 
 FOLDERS = EXT_FOLDER.values()
 
@@ -28,9 +28,7 @@ EXTS = EXT_FOLDER.keys()
 
 
 def create_folders(path):
-    """Функція створює у КАТАЛОЗІ папки відповідно до їх розширення.
-
-    """
+    """Функція створює у КАТАЛОЗІ папки відповідно до їх розширення."""
     the_path = Path(path)
 
     files_exts = set()
@@ -39,7 +37,7 @@ def create_folders(path):
 
         if item.is_file():
 
-            files_exts.add(item.suffix.lstrip('.').upper())
+            files_exts.add(item.suffix.lstrip(".").upper())
 
     for ext in files_exts:
 
@@ -53,13 +51,11 @@ def create_folders(path):
 
 
 def move_file(file):
-    """Функція переміщує файли до відповідних каталогів.
-
-    """
+    """Функція переміщує файли до відповідних каталогів."""
 
     the_path = Path(file)
 
-    ext = the_path.suffix.lstrip('.').upper()
+    ext = the_path.suffix.lstrip(".").upper()
 
     name = the_path.name
 
@@ -69,30 +65,26 @@ def move_file(file):
 
         if ext in key:
 
-            shutil.move(
-                file,
-                Path(path).joinpath(EXT_FOLDER[key]))
+            shutil.move(file, Path(path).joinpath(EXT_FOLDER[key]))
 
             if ext in ARCHIVES:
 
                 unpack(
                     Path(path).joinpath(EXT_FOLDER[key], name),
-                    Path(path).joinpath(EXT_FOLDER[key], file.stem)
-                        )
+                    Path(path).joinpath(EXT_FOLDER[key], file.stem),
+                )
 
 
 def normalise_file_name(file):
-    """Функція перейменовує файли відповідно до таблиці транслітерації TRANS.
-
-    """
+    """Функція перейменовує файли з використанням функції normalise"""
 
     the_path = Path(file)
 
     normalised_name = normalise(the_path.stem)
 
-    new_file_path = the_path.parent.joinpath("".join([normalised_name,
-                                                      the_path.suffix])
-                                             )
+    new_file_path = the_path.parent.joinpath(
+        "".join([normalised_name, the_path.suffix])
+    )
 
     the_path.rename(new_file_path)
 
@@ -100,9 +92,7 @@ def normalise_file_name(file):
 
 
 def sort_dir(path):
-    """Функція фасує файли по відповідним папкам.
-
-    """
+    """Функція фасує файли по відповідним папкам."""
 
     the_path = Path(path)
 
@@ -132,9 +122,7 @@ def sort_dir(path):
 
 
 def unpack(archive_path, path_to_unpack):
-    """Розраковувач файлів.
-
-    """
+    """Розраковувач файлів."""
     try:
 
         shutil.unpack_archive(archive_path, path_to_unpack)
@@ -147,20 +135,20 @@ def unpack(archive_path, path_to_unpack):
 """ ======================== Основна програма =============================="""
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     PATH = Path(sys.argv[1])
 
     agreement = input(
-        f'УВАГА! Ви впевнені, що хочере сортувати файли в КАТАЛОЗІ {PATH}? (y/n): '
-        )
+        f"УВАГА! Ви впевнені, що хочере сортувати файли в КАТАЛОЗІ {PATH}? (y/n): "
+    )
 
-    if agreement in ('y', 'Y', 'yes', 'Yes', 'YES'):
+    if agreement in ("y", "Y", "yes", "Yes", "YES"):
 
         sort_dir(PATH)
 
-        input('Операція успішно завершена! Натисніть довільну клавішу')
+        input("Операція успішно завершена! Натисніть довільну клавішу")
 
     else:
 
-        print('Операція відмінена!')
+        print("Операція відмінена!")
