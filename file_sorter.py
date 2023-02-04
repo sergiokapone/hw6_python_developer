@@ -151,15 +151,15 @@ if __name__ == "__main__":
         sys.exit(0)
 
     agreement = input(
-        f"УВАГА! Ви впевнені, що хочере сортувати файли в КАТАЛОЗІ {PATH}? (y/n): "
+        f"WARNING! Are you sure you want to sort the files in CATALOG? {PATH}? (y/n): "
     )
 
     if agreement in ("y", "Y", "yes", "Yes", "YES"):
 
         sort_dir(PATH)
 
-        input("Операція успішно завершена! Натисніть довільну клавішу")
+        input("Operation completed successfully! Press a any key")
 
     else:
 
-        print("Операція відмінена!")
+        print("Operation approved!")
