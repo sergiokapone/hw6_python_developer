@@ -137,7 +137,18 @@ def unpack(archive_path, path_to_unpack):
 
 if __name__ == "__main__":
 
-    PATH = Path(sys.argv[1])
+    try:
+
+        PATH = Path(sys.argv[1])
+
+    except IndexError:
+
+        print(" ======== Folder sorter v 1.0 =========\n\n",
+              f"Usage: {Path(__file__).name} <sorting dolder>\n\n",
+              "======================================"
+              )
+
+        sys.exit(0)
 
     agreement = input(
         f"УВАГА! Ви впевнені, що хочере сортувати файли в КАТАЛОЗІ {PATH}? (y/n): "
