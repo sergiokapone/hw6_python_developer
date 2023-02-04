@@ -1,11 +1,7 @@
-import sys
 import shutil
 from pathlib import Path
-
 import argparse
-parser = argparse.ArgumentParser(description='Folder sorter')
-parser.add_argument('indir', type=str, help='Input dir for sorting')
-args = parser.parse_args()
+
 
 from normaliser import normalise
 
@@ -139,6 +135,9 @@ def unpack(archive_path, path_to_unpack):
 
 """ ======================== Основна програма =============================="""
 
+parser = argparse.ArgumentParser(description='Folder sorter')
+parser.add_argument('indir', type=str, help='Input dir for sorting')
+args = parser.parse_args()
 
 if __name__ == "__main__":
 
