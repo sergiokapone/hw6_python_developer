@@ -134,20 +134,8 @@ def unpack(archive_path, path_to_unpack):
         print(f"Unsupported file format {archive_path}")
 
 
-""" ======================== Основна програма =============================="""
+def main(path):
 
-
-if __name__ == "__main__":
-
-    try:
-
-        PATH = Path(sys.argv[1])
-
-    except IndexError:
-
-        print(f'usage: {Path(__file__).name} indir')
-
-        sys.exit(0)
 
     if PATH.is_dir():
 
@@ -157,7 +145,7 @@ if __name__ == "__main__":
 
         if agreement in ("y", "Y", "yes", "Yes", "YES"):
 
-            sort_dir(PATH)
+            sort_dir(path)
 
             input("Operation completed successfully! Press a any key")
 
@@ -170,7 +158,19 @@ if __name__ == "__main__":
         print(f"Sorry, {PATH.name} is a file. You cannot process the file!")
 
 
+""" ======================== Основна програма =============================="""
 
 
+if __name__ == "__main__":
 
+    try:
 
+        PATH = Path(sys.argv[1])
+
+        main(PATH)
+
+    except IndexError:
+
+        print(f'usage: {Path(__file__).name} indir')
+
+        sys.exit(0)
