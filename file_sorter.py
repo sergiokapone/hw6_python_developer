@@ -167,7 +167,7 @@ if __name__ == "__main__":
 
     else:
 
-        print(f"Parameter {PATH.name} is not a folder")
+        print(f"{PATH.name}is a file. You cannot process the file")
 
 
 
