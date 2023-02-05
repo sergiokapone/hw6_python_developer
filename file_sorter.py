@@ -124,6 +124,7 @@ def sort_dir(path):
 
 def unpack(archive_path, path_to_unpack):
     """Розраковувач файлів."""
+
     try:
 
         shutil.unpack_archive(archive_path, path_to_unpack)
@@ -148,16 +149,28 @@ if __name__ == "__main__":
 
         sys.exit(0)
 
-    agreement = input(
-        f"WARNING! Are you sure you want to sort the files in CATALOG? {PATH}? (y/n): "
-    )
+    if PATH.is_dir():
 
-    if agreement in ("y", "Y", "yes", "Yes", "YES"):
+        agreement = input(
+            f"WARNING! Are you sure you want to sort the files in CATALOG {PATH}? (y/n): "
+        )
 
-        sort_dir(PATH)
+        if agreement in ("y", "Y", "yes", "Yes", "YES"):
 
-        input("Operation completed successfully! Press a any key")
+            sort_dir(PATH)
+
+            input("Operation completed successfully! Press a any key")
+
+        else:
+
+            print("Operation approved!")
 
     else:
 
-        print("Operation approved!")
+        print(f"Parameter {PATH.name} is not a folder")
+
+
+
+
+
+
