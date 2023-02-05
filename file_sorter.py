@@ -1,6 +1,6 @@
 import shutil
+import sys
 from pathlib import Path
-import argparse
 
 
 from normaliser import normalise
@@ -135,13 +135,18 @@ def unpack(archive_path, path_to_unpack):
 
 """ ======================== Основна програма =============================="""
 
-parser = argparse.ArgumentParser(description='Folder sorter')
-parser.add_argument('indir', type=str, help='Input dir for sorting')
-args = parser.parse_args()
 
 if __name__ == "__main__":
 
-    PATH = Path(args.indir)
+    try:
+
+        PATH = Path(sys.argv[1])
+
+    except IndexError:
+
+        print(f'usage: {Path(__file__).name} indir')
+
+        sys.exit(0)
 
     agreement = input(
         f"WARNING! Are you sure you want to sort the files in CATALOG? {PATH}? (y/n): "
