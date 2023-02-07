@@ -68,7 +68,9 @@ def move_file(file):
 
         if ext in key:
 
-            shutil.move(file, Path(path).joinpath(EXT_FOLDER[key]))
+            target_path = Path(path).joinpath(EXT_FOLDER[key])
+
+            shutil.move(file, target_path)
 
             if ext in ARCHIVES:
 
@@ -76,6 +78,10 @@ def move_file(file):
                     Path(path).joinpath(EXT_FOLDER[key], name),
                     Path(path).joinpath(EXT_FOLDER[key], file.stem),
                 )
+
+    else:
+
+        print(f'{file} has unsupported format {ext}')
 
 
 def normalise_file_name(file):
@@ -115,11 +121,9 @@ def sort_dir(path):
 
                 create_folders(path)
 
-                for item in the_path.iterdir():
+                if item.is_file():
 
-                    if item.is_file():
-
-                        move_file(normalise_file_name(item))
+                    move_file(normalise_file_name(item))
 
 
 def unpack(archive_path, path_to_unpack):
