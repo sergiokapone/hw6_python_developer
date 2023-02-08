@@ -216,9 +216,9 @@ if __name__ == "__main__":
 
                     print(f"Folder {item.name} contain {num_of_files} file(s)")
 
-            else:
+        else:
 
-                print("Operation approved!")
+            print("Operation approved!")
 
     except IndexError:
 
