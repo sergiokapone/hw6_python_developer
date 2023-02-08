@@ -12,7 +12,6 @@ EXT_FOLDER = {
     ("doc", "docx", "txt", "xlsx", "xls", "pptx"): "documents",
     ("djvu", "djv", "pdf", "tiff"): "books",
     ("zip", "gz", "tar", "7z"): "archives",
-    ("tex", "cls", "sty"): "LaTeX",
 }
 
 """ ============================= Функці =================================="""
@@ -90,14 +89,21 @@ def sort_dir(
 
                 # --------------------------
 
-                shutil.move(item, Path(root_path).joinpath(category))
+                try:
 
-                if category == "archives":
+                    shutil.move(item, Path(root_path).joinpath(category))
 
-                    unpack(
-                        Path(root_path).joinpath(category, item.name),
-                        Path(root_path).joinpath(category, item.stem),
-                    )
+                    if category == "archives":
+
+                        unpack(
+                            Path(root_path).joinpath(category, item.name),
+                            Path(root_path).joinpath(category, item.stem),
+                        )
+                        
+                except shutil.Error as er:
+
+                    print(er)
+                    
             else:
 
                 if item.is_file():
