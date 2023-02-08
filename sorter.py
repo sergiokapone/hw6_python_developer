@@ -10,16 +10,16 @@ EXT_FOLDER = {
     ("avi", "mp4", "mov", "mkv", "flv"): "video",
     ("jpeg", "png", "jpg", "svg"): "images",
     ("doc", "docx", "txt", "xlsx", "xls", "pptx"): "documents",
-    ("djvu", "djv", "pdf", 'tiff'): "books",
+    ("djvu", "djv", "pdf", "tiff"): "books",
     ("zip", "gz", "tar", "7z"): "archives",
-    ("tex", "cls", "sty"): "LaTeX"
+    ("tex", "cls", "sty"): "LaTeX",
 }
 
 """ ============================= Функці =================================="""
 
 
 def get_file_cathegory(file: str):
-    """Функція повертає нвзву каталогу у відповідності до імені віхудного файлу."""
+    """Функція повертає назву категорії у відповідності до імені вхідного файлу."""
 
     the_path = Path(file)
 
@@ -29,31 +29,6 @@ def get_file_cathegory(file: str):
         if ext in exts:
             return EXT_FOLDER[exts]
     return None
-
-
-def create_cathegory_folders(path: str):
-    """Функція створює каталог категорії відповідно до файлу в сортованому каталозі."""
-
-    the_path = Path(path)
-
-    known_ext, unknown_ext = set(), set()
-
-    cathegories = set()
-
-    for file in the_path.glob("**/*.*"):
-
-        cattheory = get_file_cathegory(file)
-
-        if cattheory:
-            cathegories.add(cattheory)
-            known_ext.add(file.suffix)
-            cathegory_path = Path(the_path.joinpath(get_file_cathegory(file)))
-            cathegory_path.mkdir(exist_ok=True)
-
-        else:
-            unknown_ext.add(file.suffix)
-
-    return tuple(cathegories), tuple(known_ext), tuple(unknown_ext)
 
 
 def normalise_file_name(file: str):
@@ -72,48 +47,63 @@ def normalise_file_name(file: str):
     return new_file_path
 
 
-def sort_dir(path):
+def create_folders(root):
+    """Створює папки каталогів у root"""
+
+    for folder in EXT_FOLDER.values():
+
+        Path(root).joinpath(folder).mkdir(exist_ok=True)
+
+
+def sort_dir(
+    path, level=0, known_exts=set(), unknown_exts=set(), categories=set()
+):
     """Функція фасує файли по відповідним папкам."""
 
     the_path = Path(path)
 
-    main_path = Path(ROOT)
+    if level == 0:
 
-    if not any(the_path.iterdir()):
+        global root_path
 
-        the_path.rmdir()
+        root_path = the_path.resolve()
 
-    else:
+    for item in the_path.iterdir():
 
-        for item in the_path.iterdir():
+        if item.is_dir() and item.name not in EXT_FOLDER.values():
 
-            cathegory = get_file_cathegory(item)
+            sort_dir(item.resolve(), level + 1)
 
-            if item.is_dir() and item.name not in EXT_FOLDER.values():
+        else:
 
-                sort_dir(the_path.joinpath(item.name))
+            category = get_file_cathegory(item.name)
 
+            if category:
+
+                # --------------------------
+
+                categories.add(category)
+
+                known_exts.add(item.suffix)
+
+                item = normalise_file_name(item)
+
+                # --------------------------
+
+                shutil.move(item, Path(root_path).joinpath(category))
+
+                if category == "archives":
+
+                    unpack(
+                        Path(root_path).joinpath(category, item.name),
+                        Path(root_path).joinpath(category, item.stem),
+                    )
             else:
 
-                if item.is_file() and cathegory:
+                if item.is_file():
+                    unknown_exts.add(item.suffix)
 
-                    try:
-
-                        shutil.move(
-                            normalise_file_name(item),
-                            main_path.joinpath(cathegory),
-                        )
-
-                        if cathegory == "archives":
-
-                            unpack(
-                                main_path.joinpath(cathegory, item.name),
-                                main_path.joinpath(cathegory, item.stem),
-                            )
-
-                    except shutil.Error:
-
-                        print("File exist")
+    return tuple(unknown_exts)
 
 
 def unpack(archive_path, path_to_unpack):
@@ -129,26 +119,44 @@ def unpack(archive_path, path_to_unpack):
 
 
 def remove_empty(path):
+    """Видаляє порожні папки."""
 
     the_path = Path(path)
 
-    count_removed = []
+    empty = True
 
-    if not any(the_path.iterdir()):
+    for item in the_path.glob("*"):
 
-        the_path.rmdir()
+        if item.is_file():
 
-    else:
+            empty = False
 
-        for item in the_path.iterdir():
+        if item.is_dir() and not remove_empty(item):
 
-            if item.is_dir():
+            empty = False
 
-                remove_empty(the_path.joinpath(item.name))
+    if empty:
 
-                count_removed.append(the_path.joinpath(item.name))
+        path.rmdir()
 
-    return count_removed
+    return empty
+
+
+def known_exts(root):
+
+    exts = set()
+
+    for item in Path(root).iterdir():
+
+        if item.is_dir():
+
+            for file in item.iterdir():
+
+                if file.is_file():
+
+                    exts.add(file.suffix)
+
+    return exts
 
 
 """ ======================== Основна програма =============================="""
@@ -160,44 +168,58 @@ if __name__ == "__main__":
 
         ROOT = sys.argv[1]
 
-        cathegories, known_exts, unknown_exts = create_cathegory_folders(ROOT)
+        agreement = input(
+            f"WARNING! Are you sure you want to sort the files in CATALOG {ROOT}? (y/n): "
+        )
 
-        print("-------------------")
-        print("Known extensions:")
-        print("-------------------")
+        if agreement in ("y", "Y", "yes", "Yes", "YES"):
 
-        for ext in known_exts:
+            create_folders(ROOT)
 
-            print(ext)
+            unknown_exts = sort_dir(ROOT)
 
-        print("-------------------")
-        print("Unknown extensions:")
-        print("-------------------")
+            remove_empty(ROOT)
 
-        for ext in unknown_exts:
+            print("-------------------")
+            print("Known extensions:")
+            print("-------------------")
 
-            print(ext)
+            for ext in known_exts(ROOT):
 
-        print("-------------------")
-        print("Files in folders:")
-        print("-------------------")
+                print(ext)
 
-        sort_dir(ROOT)
+            if len(unknown_exts) != 0:
 
-        for value in cathegories:
+                print("-------------------")
+                print("Unknown extensions:")
+                print("-------------------")
 
-            num_of_files = len(
-                [
-                    file
-                    for file in Path(ROOT).joinpath(value).iterdir()
-                    if file.is_file()
-                ]
-            )
+                for ext in unknown_exts:
 
-            print(f"Cathegory {value} contain {num_of_files} files")
+                    print(ext)
 
-        remove_empty(ROOT)
+            print("-------------------")
+            print("Files in folders:")
+            print("-------------------")
+
+            for item in Path(ROOT).iterdir():
+
+                if item.is_dir():
+
+                    num_of_files = len(
+                        [
+                            file
+                            for file in Path(ROOT).joinpath(item).iterdir()
+                            if file.is_file()
+                        ]
+                    )
+
+                    print(f"Folder {item.name} contain {num_of_files} file(s)")
+
+            else:
+
+                print("Operation approved!")
 
     except IndexError:
 
-        print("noup")
+        print(f"usage: {Path(__file__).name} indir")
