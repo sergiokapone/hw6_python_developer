@@ -99,11 +99,11 @@ def sort_dir(
                             Path(root_path).joinpath(category, item.name),
                             Path(root_path).joinpath(category, item.stem),
                         )
-                        
+
                 except shutil.Error as er:
 
                     print(er)
-                    
+
             else:
 
                 if item.is_file():
